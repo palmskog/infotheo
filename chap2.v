@@ -428,7 +428,7 @@ Proof.
 rewrite /h (big_morph _ morph_Ropp oppR0) /=; apply eq_bigr => a _.
 rewrite /h1 mulRN big_distrr /=; congr (- _); apply eq_bigr => b _.
 rewrite mulRA; congr (_ * _).
-by rewrite mulRC -(Pr_set1 P a) -Pr_cPr Pr_setX1 Pr_set1 Swap.dE.
+by rewrite mulRC -(Pr_set1 P a) -Pr_cPr setX1 Swap.dE Pr_set1.
 Qed.
 
 Lemma h1_ge0 a : 0 <= h1 a.
@@ -551,7 +551,7 @@ transitivity (- (\rsum_(a in A) \rsum_(b in B)
   congr (- _); rewrite pair_big /=; apply eq_bigr => -[a b] _ /=.
   congr (_ * log _); case/boolP : (P a == 0) => [/eqP|] H0.
   - by rewrite (Bivar.dom_by_fst _ H0) H0 mul0R.
-  - by rewrite -(Pr_set1 P a) /P -(Swap.snd PQ) mulRC -Pr_cPr Pr_setX1 Pr_set1 Swap.dE.
+  - by rewrite -(Pr_set1 P a) /P -(Swap.snd PQ) mulRC -Pr_cPr setX1 Pr_set1 Swap.dE.
 transitivity (
   - (\rsum_(a in A) \rsum_(b in B) PQ (a, b) * log (P a))
   - (\rsum_(a in A) \rsum_(b in B) PQ (a, b) * log (\Pr_QP [ [set b] | [set a] ]))). (* 2.17 *)
@@ -560,7 +560,7 @@ transitivity (
   case/boolP : (PQ (a, b) == 0) => [/eqP H0|H0].
   - by rewrite H0 !mul0R addR0.
   - rewrite -mulRDr; congr (_ * _); rewrite mulRC logM //.
-    by rewrite -cPr_Pr_setX_gt0 Pr_setX1 Pr_set1 Swap.dE -dist_neq0.
+    by rewrite -cPr_Pr_setX_gt0 setX1 Pr_set1 Swap.dE -dist_neq0.
     rewrite -dist_neq0; exact: Bivar.dom_by_fstN H0.
 rewrite /CondEntropy.h [in X in _ + X = _](big_morph _ morph_Ropp oppR0); congr (_ + _).
 - (* TODO: lemma? *)
@@ -570,7 +570,7 @@ rewrite /CondEntropy.h [in X in _ + X = _](big_morph _ morph_Ropp oppR0); congr 
   rewrite /CondEntropy.h1 /= mulRN; congr (- _).
   rewrite big_distrr /=; apply eq_bigr => b _.
   rewrite mulRA; congr (_ * _).
-  by rewrite -(Pr_set1 (Bivar.snd _) a) mulRC -Pr_cPr Pr_setX1 Pr_set1 Swap.dE.
+  by rewrite -(Pr_set1 (Bivar.snd _) a) mulRC -Pr_cPr setX1 Pr_set1 Swap.dE.
 Qed.
 
 End chain_rule.
@@ -596,11 +596,11 @@ rewrite !(Swap.dE,TripA.dE,TripC12.dE) /= -mulRDr.
 case/boolP : (PQR (a, b, c) == 0) => [/eqP H0|H0].
   by rewrite H0 !mul0R.
 rewrite -logM; last 2 first.
-  rewrite -cPr_Pr_setX_gt0 Pr_gt0 Pr_setX1 Pr_set1; exact: Proj13.dominN H0.
-  by rewrite -cPr_Pr_setX_gt0 Pr_gt0 Pr_setX1 Pr_set1 TripA.dE /= TripC12.dE.
+  rewrite -cPr_Pr_setX_gt0 Pr_gt0 setX1 Pr_set1; exact: Proj13.dominN H0.
+  by rewrite -cPr_Pr_setX_gt0 Pr_gt0 setX1 Pr_set1 TripA.dE /= TripC12.dE.
 congr (_ * log _).
 (* TODO: lemma? *)
-rewrite /cPr !Pr_setX1 !Pr_set1.
+rewrite /cPr !setX1 !Pr_set1.
 rewrite mulRCA -mulRA TripA.dE TripC12.dE /=; congr (_ * _).
 rewrite -invRM; last 2 first.
   apply/eqP; rewrite (@Bivar.dom_by_sndN _ _ _ a) //; exact: Proj13.dominN H0.
@@ -680,7 +680,7 @@ rewrite miE.
 transitivity (\rsum_(a in A) \rsum_(b in B)
     PQ (a, b) * log (\Pr_PQ [ [set a] | [set b] ] / P a)).
   apply eq_bigr => a _; apply eq_bigr => b _.
-  rewrite /cPr Pr_setX1 2!Pr_set1 /= -/Q.
+  rewrite /cPr setX1 2!Pr_set1 /= -/Q.
   case/boolP : (PQ (a, b) == 0) => [/eqP H0 | H0].
   - by rewrite H0 !mul0R.
   - congr (_ * log _).
@@ -696,7 +696,7 @@ transitivity (- (\rsum_(a in A) \rsum_(b in B) PQ (a, b) * log (P a)) +
   case/boolP : (PQ (a, b) == 0) => [/eqP ->| H0].
   - by rewrite !mul0R.
   - congr (_ * _); rewrite logDiv //.
-    + by rewrite -cPr_Pr_setX_gt0 Pr_gt0 Pr_setX1 Pr_set1.
+    + by rewrite -cPr_Pr_setX_gt0 Pr_gt0 setX1 Pr_set1.
     + rewrite -dist_neq0; exact: Bivar.dom_by_fstN H0.
 rewrite -subR_opp; congr (_ - _).
 - rewrite /entropy; congr (- _); apply/eq_bigr => a _.
@@ -706,7 +706,7 @@ rewrite -subR_opp; congr (_ - _).
   rewrite mulRN; congr (- _).
   rewrite big_distrr /=; apply eq_bigr=> a _ /=.
   rewrite mulRA; congr (_ * _); rewrite -/Q.
-  by rewrite -[in LHS]Pr_set1 -Pr_setX1 Pr_cPr Pr_set1 -/Q mulRC.
+  by rewrite -[in LHS]Pr_set1 -setX1 Pr_cPr Pr_set1 -/Q mulRC.
 Qed.
 
 Lemma miE3 : mi = `H Q - CondEntropy.h QP. (* 2.40 *)
@@ -884,7 +884,7 @@ Lemma cdiv1_ge0 z : 0 <= cdiv1 z.
 Proof.
 case/boolP : ((Bivar.snd PQR) z == 0) => [/eqP|] z0.
   apply rsumr_ge0 => -[a b] _.
-  rewrite {1}/cPr Pr_setX1 Pr_set1 (Bivar.dom_by_snd _ z0) div0R mul0R.
+  rewrite {1}/cPr setX1 Pr_set1 (Bivar.dom_by_snd _ z0) div0R mul0R.
   exact: leRR.
 rewrite cdiv1_is_div.
   by rewrite Proj13.snd.
@@ -893,10 +893,10 @@ move=> Hz1 Hz2; apply div_ge0.
 (* TODO: lemma *)
 apply/dominatesP => -[a b].
 rewrite ProdDist.dE !CondDist.dE /= mulR_eq0 => -[|].
-- rewrite /cPr !Pr_setX1 !Pr_set1 !mulR_eq0 => -[|].
+- rewrite /cPr !setX1 !Pr_set1 !mulR_eq0 => -[|].
   move/Proj13.domin => ->; by left.
   rewrite Proj13.snd /Rdiv => ->; by right.
-- rewrite /cPr !Pr_setX1 !Pr_set1 !mulR_eq0 => -[|].
+- rewrite /cPr !setX1 !Pr_set1 !mulR_eq0 => -[|].
   move/Proj23.domin => ->; by left.
   rewrite Proj23.snd => ->; by right.
 Qed.
@@ -939,22 +939,22 @@ rewrite Swap.dE TripA.dE /= -mulRN -mulRDr.
 case/boolP : (PQR (a, b, c) == 0) => [/eqP ->| H0]; first by rewrite !mul0R.
 congr (_ * _).
 rewrite addRC addR_opp -logDiv; last 2 first.
-  rewrite -cPr_Pr_setX_gt0 Pr_gt0 Pr_setX1 Pr_set1; exact: TripA.dominN H0.
-  rewrite -cPr_Pr_setX_gt0 Pr_gt0 Pr_setX1 Pr_set1; exact: Proj13.dominN H0.
+  rewrite -cPr_Pr_setX_gt0 Pr_gt0 setX1 Pr_set1; exact: TripA.dominN H0.
+  rewrite -cPr_Pr_setX_gt0 Pr_gt0 setX1 Pr_set1; exact: Proj13.dominN H0.
 congr (log _).
 rewrite divRM; last 2 first.
   apply/eqP.
-  rewrite -cPr_gt0 -cPr_Pr_setX_gt0 Pr_gt0 Pr_setX1 Pr_set1; exact: Proj13.dominN H0.
+  rewrite -cPr_gt0 -cPr_Pr_setX_gt0 Pr_gt0 setX1 Pr_set1; exact: Proj13.dominN H0.
   apply/eqP.
-  rewrite -cPr_gt0 -cPr_Pr_setX_gt0 Pr_gt0 Pr_setX1 Pr_set1; exact: Proj23.dominN H0.
+  rewrite -cPr_gt0 -cPr_Pr_setX_gt0 Pr_gt0 setX1 Pr_set1; exact: Proj23.dominN H0.
 rewrite {2}/Rdiv -mulRA mulRCA {1}/Rdiv [in LHS]mulRC; congr (_ * _).
 (* TODO: lemma? *)
-rewrite /cPr !Pr_setX1 !Pr_set1 TripA.dE /= {1 2}/Rdiv -mulRA; congr (_ * _).
+rewrite /cPr !setX1 !Pr_set1 TripA.dE /= {1 2}/Rdiv -mulRA; congr (_ * _).
 rewrite -invRM; last 2 first.
   apply/eqP; exact: Bivar.dom_by_sndN H0.
-  apply/eqP; rewrite mulR_neq0; apply/andP; split.
+  rewrite mulR_neq0; split; apply/eqP.
   exact: Proj23.dominN H0.
-  move/Bivar.dom_by_sndN in H0; by rewrite invR_neq0 // Proj23.snd.
+  move/Bivar.dom_by_sndN in H0; by rewrite invR_neq0' // Proj23.snd.
 congr (/ _).
 rewrite Proj23.snd mulRCA mulRV ?mulR1 //.
 by rewrite Proj23.def.
@@ -976,7 +976,7 @@ rewrite exchange_big; apply eq_bigr => c _ /=.
 rewrite big_distrr /=; apply eq_bigr => -[a b] _ /=; rewrite mulRA; congr (_ * _).
 rewrite mulRC.
 move: (Pr_cPr PQR [set (a, b)] [set c]); rewrite -/R Pr_set1 => <-.
-by rewrite Pr_setX1 Pr_set1.
+by rewrite setX1 Pr_set1.
 Qed.
 
 (* 2.92 *)
@@ -1023,8 +1023,8 @@ rewrite (_ : P2 a * _ = P (b, a)); last first.
   rewrite /cPr Pr_set1 -/P2 mulRCA.
   case/boolP : (P2 a == 0) => [/eqP|] P2a0.
     have Pba0 : P (b, a) = 0 by apply Bivar.dom_by_snd.
-    by rewrite Pr_setX1 Pr_set1 Pba0 mul0R.
-  by rewrite mulRV // mulR1 Pr_setX1 Pr_set1.
+    by rewrite setX1 Pr_set1 Pba0 mul0R.
+  by rewrite mulRV // mulR1 setX1 Pr_set1.
 rewrite -mulRDr.
 case/boolP : (P (b, a) == 0) => [/eqP ->|H0]; first by rewrite !mul0R.
 congr (_ * _).
@@ -1033,9 +1033,9 @@ have Qba0 := dominatesEN PQ H0.
 have Q2a0 : Q2 a != 0 by apply: Bivar.dom_by_sndN Qba0.
 rewrite -logM; last 2 first.
   apply/divR_gt0; rewrite -dist_neq0 //.
-  apply/divR_gt0; by rewrite -cPr_Pr_setX_gt0 Pr_setX1 Pr_set1 -dist_neq0.
+  apply/divR_gt0; by rewrite -cPr_Pr_setX_gt0 setX1 Pr_set1 -dist_neq0.
 congr (log _).
-rewrite /cPr !Pr_setX1 !Pr_set1 -/P2 -/Q2.
+rewrite /cPr !setX1 !Pr_set1 -/P2 -/Q2.
 rewrite {3}/Rdiv.
 rewrite Rinv_Rdiv; [|exact/eqP|exact/eqP].
 rewrite !mulRA; congr (_ * _).
@@ -1044,7 +1044,7 @@ rewrite -mulRA.
 rewrite (mulRC (/ _) (Q2 a)).
 rewrite -/(Rdiv (Q2 a) (P2 a)) -(Rinv_Rdiv (P2 a) (Q2 a)); [|exact/eqP|exact/eqP].
 rewrite -mulRA mulRV ?mulR1 // mulR_eq0' negb_or P2a0 /=.
-apply: contra Q2a0; exact: invR_eq0.
+apply: contra Q2a0; exact: invR_eq0'.
 Qed.
 
 End conditional_relative_entropy.
@@ -1329,27 +1329,27 @@ rewrite cmiE (eq_bigr (fun=> 0)) ?big_const ?iter_addR ?mulR0 //= => x _.
 case/boolP : (PRQ x == 0) => [/eqP ->|H0]; first by rewrite mul0R.
 rewrite (_ : _ / _ = 1); first by rewrite /log Log_1 mulR0.
 rewrite eqR_divr_mulr ?mul1R; last first.
-  rewrite mulR_neq0; apply/andP; split.
+  rewrite mulR_neq0'; apply/andP; split.
     (* TODO: lemma? *)
-    rewrite /cPr mulR_neq0; apply/andP; split.
+    rewrite /cPr mulR_neq0'; apply/andP; split.
       (* TODO: lemma? *)
-      rewrite Pr_setX1 Pr_set1.
+      rewrite setX1 Pr_set1.
       case: x => [[x11 x12] x2] in H0 *.
       exact: Proj13.dominN H0.
-    rewrite invR_neq0 // Pr_set1 Proj13.snd.
+    rewrite invR_neq0' // Pr_set1 Proj13.snd.
     case: x => [x1 x2] in H0 *.
     exact: Bivar.dom_by_sndN H0.
   (* TODO: lemma? *)
-  rewrite /cPr mulR_neq0; apply/andP; split.
-    rewrite Pr_setX1 Pr_set1.
+  rewrite /cPr mulR_neq0'; apply/andP; split.
+    rewrite setX1 Pr_set1.
     case: x => [[x11 x12] x2] in H0 *.
     exact: Proj23.dominN H0.
-  rewrite invR_neq0 // Pr_set1 Proj23.snd.
+  rewrite invR_neq0' // Pr_set1 Proj23.snd.
   case: x => [x1 x2] in H0 *.
   exact: Bivar.dom_by_sndN H0.
 (* TODO: lemma? *) (* 2.118 *)
 transitivity (Pr PRQ [set x] / Pr Q [set x.2]).
-  rewrite /cPr Pr_setX1 {2}/PRQ TripC23.snd -/Q; by case: x H0.
+  rewrite /cPr setX1 {2}/PRQ TripC23.snd -/Q; by case: x H0.
 transitivity (Pr PQ [set (x.1.1,x.2)] * \Pr_RQ[[set x.1.2]|[set x.2]] / Pr Q [set x.2]).
   congr (_ / _).
   case: x H0 => [[a c] b] H0 /=.
@@ -1358,10 +1358,10 @@ transitivity (Pr PQ [set (x.1.1,x.2)] * \Pr_RQ[[set x.1.2]|[set x.2]] / Pr Q [se
     apply Bivar.dom_by_fstN with b.
     apply Bivar.dom_by_fstN with c.
     by rewrite TripC23.dE in H0.
-  by rewrite /QP -Swap.Pr Pr_setX1.
+  by rewrite /QP -Swap.Pr setX1.
 rewrite {1}/Rdiv -mulRA mulRCA mulRC; congr (_ * _).
   rewrite /cPr Proj13.snd -/Q {2}/PRQ TripC23.snd -/Q -/(Rdiv _ _); congr (_ / _).
-  by rewrite /PRQ /PQ Pr_setX1 Proj13_TripC23.
+  by rewrite /PRQ /PQ setX1 Proj13_TripC23.
 rewrite /cPr Proj23.snd; congr (_ / _).
 - by rewrite /RQ /PRQ Proj23.def TripC23.sndA.
 - by rewrite /RQ Swap.snd TripA.fst_snd /PRQ TripC23.snd.

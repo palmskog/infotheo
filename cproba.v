@@ -247,6 +247,11 @@ Section prop.
 Variables (A B C : finType) (P : {dist A * B * C}).
 Lemma dI : d (d P) = P.
 Proof. by apply/dist_ext => -[[a b] c]; rewrite !dE /=. Qed.
+Lemma Pr E F G : Pr (d P) (setX (setX E F) G) = Pr P (setX (setX F E) G).
+Proof.
+rewrite /Pr !big_setX /= exchange_big; apply eq_bigr => a aF.
+by apply eq_bigr => b bE; apply eq_bigr => c cG; rewrite dE.
+Qed.
 End prop.
 End TripC12.
 
@@ -340,6 +345,7 @@ Lemma fst : Bivar.fst d = Bivar.fst (TripA.d P).
 Proof. by rewrite def TripA.fst_snd TripC12.fst Swap.snd TripA.fst. Qed.
 
 End def.
+
 End Proj13.
 
 Module Proj23.
@@ -394,7 +400,7 @@ Local Notation "\Pr[ E | F ]" := (cPr E F).
 Lemma Pr_cPr E F : Pr P (setX E F) = \Pr[E | F] * Pr (Bivar.snd P) F.
 Proof.
 case/boolP : (Pr (Bivar.snd P) F == 0) => [/eqP H0|H0].
-- by rewrite H0 mulR0 Pr_snd_eq0.
+- by rewrite H0 mulR0 Pr_domin_snd.
 - by rewrite /cPr -mulRA mulVR // mulR1.
 Qed.
 
@@ -405,14 +411,14 @@ by rewrite Bivar.fstE /=; apply eq_bigl => b; rewrite inE.
 Qed.
 
 Lemma cPr_set0 E : \Pr[E | set0] = 0.
-Proof. by rewrite /cPr Pr_snd_eq0 ?div0R // Pr_set0. Qed.
+Proof. by rewrite /cPr Pr_domin_snd ?div0R // Pr_set0. Qed.
 
 Lemma cPr_ge0 E F : 0 <= \Pr[E | F].
 Proof.
 rewrite /cPr.
 case/boolP : (Pr (Bivar.snd P) F == 0) => [/eqP|] H0.
   suff -> : Pr P (setX E F) = 0 by rewrite div0R; exact: leRR.
-  by rewrite Pr_snd_eq0.
+  by rewrite Pr_domin_snd.
 apply divR_ge0; [exact: Pr_ge0 | by rewrite Pr_gt0].
 Qed.
 
@@ -420,7 +426,7 @@ Lemma cPr_max E F : \Pr[E | F] <= 1.
 Proof.
 rewrite /cPr.
 case/boolP : (Pr (Bivar.snd P) F == 0) => [/eqP|] H0.
-  by rewrite Pr_snd_eq0 // div0R.
+  by rewrite Pr_domin_snd // div0R.
 rewrite leR_pdivr_mulr ?Pr_gt0 // mul1R /Pr big_setX /= exchange_big /=.
 apply ler_rsum => b0 _.
 rewrite Bivar.sndE; apply ler_rsum_l => // a0 _;
@@ -439,7 +445,7 @@ rewrite Pr_gt0; split => H; last first.
   move/cPr_gt0 : H; apply: contra.
   rewrite /cPr => /eqP ->; by rewrite div0R.
 rewrite /cPr; apply/divR_gt0; first by rewrite Pr_gt0.
-rewrite Pr_gt0; apply: contra H => /eqP H; by rewrite Pr_snd_eq0.
+rewrite Pr_gt0; apply: contra H => /eqP H; by rewrite Pr_domin_snd.
 Qed.
 
 End conditional_probability.
@@ -449,23 +455,36 @@ Notation "\Pr_ P [ A | B ]" := (cPr P A B) : proba_scope.
 Section conditional_probability_prop.
 Variables (A B C : finType) (P : {dist A * B * C}).
 
-Lemma Pr_TripC12 (E : {set A * B}) (F : {set C}) :
+Lemma cPr_TripC12 (E : {set A}) (F : {set B }) (G : {set C}) :
+  \Pr_(TripC12.d P)[setX F E | G] = \Pr_P[setX E F | G].
+Proof. by rewrite /cPr TripC12.Pr TripC12.snd. Qed.
+(*Lemma cPr_TripC12 (E : {set A * B}) (F : {set C}) :
   \Pr_P[E | F] = \Pr_(TripC12.d P)[swap @: E | F].
 Proof.
 rewrite /cPr TripC12.snd; congr (_ / _).
 rewrite /Pr 2!big_setX /= [in LHS]exchange_big /= [in RHS]exchange_big /=.
 apply eq_bigr => c cF; rewrite (big_imset _ (@injective_swap _ _ E)) /=.
 apply eq_bigr => -[? ?] _; by rewrite TripC12.dE.
-Qed.
+Qed.*)
 
 Lemma cPr_TripA_TripC23 (E : {set A}) (F : {set B}) (G : {set C}) :
   \Pr_(TripA.d (TripC23.d P))[E | setX G F] = \Pr_(TripA.d P)[E | setX F G].
 Proof.
+rewrite /cPr 2!TripA.Pr TripC23.Pr; congr (_ / _).
+by rewrite TripC23.sndA Swap.Pr Swap.dI.
+Qed.
+
+Lemma cPr_TripA_TripC12 (E : {set A}) (F : {set B}) (G : {set C}) :
+  \Pr_(TripA.d (TripC12.d P))[F | setX E G] = \Pr_(TripA.d (Swap.d (TripA.d P)))[F| setX G E].
+Proof.
 rewrite /cPr; congr (_ / _).
-- rewrite /Pr !big_setX /=; apply eq_bigr => a _; rewrite !big_setX /=.
-  rewrite exchange_big /=; apply eq_bigr => c0 _; apply eq_bigr => b0 _.
-  by rewrite !TripA.dE /= TripC23.dE.
-- by rewrite [in LHS]TripC23.sndA [in RHS]Swap.Pr.
+by rewrite TripA.Pr TripC12.Pr TripA.Pr [in RHS]Swap.Pr Swap.dI TripA.Pr.
+rewrite -Proj13.def -(Swap.dI (Proj13.d P)) Swap.Pr Swap.dI; congr Pr.
+(* TODO: lemma *)
+rewrite Proj13.def.
+apply/dist_ext => -[c a].
+rewrite Swap.dE 2!Bivar.sndE; apply eq_bigr => b _.
+by rewrite !(TripA.dE,Swap.dE,TripC12.dE).
 Qed.
 
 End conditional_probability_prop.
@@ -512,7 +531,7 @@ Lemma bayes E F : \Pr_PQ[E | F] = \Pr_QP [F | E] * Pr P E / Pr Q F.
 Proof.
 rewrite /cPr -Swap.Pr Swap.snd -/Q -/P.
 case/boolP : (Pr P E == 0) => [/eqP|] H0.
-  by rewrite Pr_fst_eq0 // !(mul0R,div0R).
+  by rewrite Pr_domin_fst // !(mul0R,div0R).
 - rewrite /Rdiv -!mulRA; congr (_ * _).
   by rewrite mulRCA mulRA mulRV // mul1R.
 Qed.
@@ -552,16 +571,6 @@ Implicit Types (E : {set A}) (F : {set B}) (G : {set C}).
 
 Lemma product_ruleC E F G :
   \Pr_P [ setX E F | G] = \Pr_(TripA.d (TripC12.d P)) [F | setX E G] * \Pr_(Proj13.d P) [E | G].
-Proof.
-rewrite Pr_TripC12.
-transitivity (\Pr_(TripC12.d P)[setX F E | G]).
-  rewrite -Pr_TripC12.
-  rewrite /cPr; congr (_ / _).
-    rewrite /Pr !big_setX /= exchange_big /=; apply eq_bigr => b0 _.
-    apply eq_bigr => a0 _; apply eq_bigr => c0 _.
-    by rewrite TripC12.dE.
-  by rewrite TripC12.snd.
-by rewrite product_rule.
-Qed.
+Proof. by rewrite -cPr_TripC12 product_rule. Qed.
 End variant.
 End product_rule.

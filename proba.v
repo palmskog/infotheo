@@ -352,7 +352,7 @@ End uniform.
 Lemma d_neq0 (C : finType) (domain_non_empty : { m : nat | #| C | = m.+1 }) :
   forall x, d (projT2 domain_non_empty) x != 0.
 Proof.
-move=> c; rewrite dE invR_neq0 //; apply/eqP.
+move=> c; rewrite dE invR_neq0' //; apply/eqP.
 case: domain_non_empty => x' ->; by rewrite INR_eq0.
 Qed.
 
@@ -423,7 +423,7 @@ Qed.
 Lemma neq0 z : ((`U HC) z != 0) = (z \in C).
 Proof.
 case/boolP : (z \in C) => [/E ->|/E0 ->//]; last by rewrite eqxx.
-rewrite div1R; by apply/invR_neq0; rewrite INR_eq0' -lt0n.
+rewrite div1R; by apply/invR_neq0'; rewrite INR_eq0' -lt0n.
 Qed.
 
 End UniformSupport_prop.
@@ -560,7 +560,7 @@ apply/idP/idP; first by apply: contra => /eqP ->; rewrite div0R.
 apply: contra; rewrite /Rdiv mulR_eq0' => /orP[//|H].
 exfalso.
 move/negPn/negP : H; apply.
-apply/invR_neq0; by apply: contra Xb1; rewrite subR_eq0 eq_sym.
+apply/invR_neq0'; by apply: contra Xb1; rewrite subR_eq0 eq_sym.
 Qed.
 
 Lemma d_eq0 a (Xa0 : X a != 0) : ((d a == 0) = (b == a))%bool.
@@ -568,7 +568,7 @@ Proof.
 rewrite dE; case: ifPn => [/eqP ->|ab]; first by rewrite !eqxx.
 apply/idP/idP => [|]; last by rewrite eq_sym (negbTE ab).
 rewrite mulR_eq0' => /orP[]; first by rewrite (negbTE Xa0).
-by move/invR_eq0; rewrite subR_eq0 eq_sym (negbTE Xb1).
+by move/invR_eq0'; rewrite subR_eq0 eq_sym (negbTE Xb1).
 Qed.
 
 Lemma d_0 a : X a = 0 -> d a = 0.
@@ -1197,26 +1197,27 @@ Proof. by rewrite Pr_union_eq subRBA addRC addRK. Qed.
 
 End probability.
 
-Lemma Pr_fst_eq0 (A B : finType) (P : {dist (A * B)}) a b :
+Lemma Pr_domin_fst (A B : finType) (P : {dist A * B}) a b :
   Pr (Bivar.fst P) a = 0%R -> Pr P (setX a b) = 0%R.
 Proof.
 move/Pr_set0P => H; apply/Pr_set0P => -[? ?].
 by rewrite inE /= => /andP[/H /Bivar.dom_by_fst ->].
 Qed.
 
-Lemma Pr_snd_eq0 (A B : finType) (P : {dist (A * B)}) a b :
+Lemma Pr_domin_fstN (A B : finType) (P : {dist A * B}) a b :
+  Pr P (setX a b) != 0%R -> Pr (Bivar.fst P) a != 0%R.
+Proof. apply/contra => /eqP/Pr_domin_fst => ?; exact/eqP. Qed.
+
+Lemma Pr_domin_snd (A B : finType) (P : {dist A * B}) a b :
   Pr (Bivar.snd P) b = 0%R -> Pr P (setX a b) = 0%R.
 Proof.
 move/Pr_set0P => H; apply/Pr_set0P => -[? ?].
 by rewrite inE /= => /andP[_ /H /Bivar.dom_by_snd ->].
 Qed.
 
-Lemma Pr_setX1 (A B : finType) (PQ : {dist (A * B)}) a b :
-  Pr PQ (setX [set a] [set b]) = Pr PQ [set (a, b)].
-Proof.
-rewrite (_ : setX [set a] _ = [set (a, b)]) //.
-apply/setP => -[x1 x2]; by rewrite !inE /= xpair_eqE.
-Qed.
+Lemma Pr_domin_sndN (A B : finType) (P : {dist A * B}) a b :
+  Pr P (setX a b) != 0%R -> Pr (Bivar.snd P) b != 0%R.
+Proof. apply/contra => /eqP/Pr_domin_snd => ?; exact/eqP. Qed.
 
 (*Section Pr_tuple_prod.
 
